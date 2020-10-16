@@ -4,6 +4,8 @@ from mask import nomask, nomasks # , mask
 from pprint import pformat
 
 allVerbose = ['activation', 'alpha', 'odelta', 'idelta', 'wdelta']
+def inVerbose(s):
+    return s.lower() in allVerbose
 
 class WeightMatrix:
     weights = False   # A 2-dimensional array of coefficients.
@@ -125,7 +127,8 @@ class WeightMatrix:
         batch_size = len(prediction)
         assert batch_size == len(goal)
         oDelta = (goal - prediction) / batch_size
-        # print("Layer OD: ", oDelta)
+        # if inVerbose('oDelta'):
+        #     print("oDelta: ", oDelta)
 
         # if not isinstance(datain,np.ndarray):
         #     datain = np.array(datain)
@@ -133,16 +136,18 @@ class WeightMatrix:
         try:
             error = np.sum(oDelta ** 2)
         except:
-            print('Error:', oDelta)
+            print('oDelta * 2 fails:', oDelta)
             sys.exit()
 
         derivs = self.derFunction(datain)
         iDelta = oDelta.dot(self.weights.T)
+        # if inVerbose('iDelta'):
+        #     print("iDelta: ", iDelta)
         if self.bias:
             iDelta = np.delete(iDelta, -1, 1)
             biasColumn = np.ones((len(datain),1))
             datain = np.block([datain, biasColumn])
-        iDelta *=  derivs
+        iDelta *= derivs
         # if isinstance(imask, np.ndarray):
         #     sm = imask.shape
         #     sd = iDelta.shape
@@ -151,6 +156,8 @@ class WeightMatrix:
         dotIO = datain.T.dot(oDelta)
         # print("LI * LOD:", dotIO)
         wDelta = self.alpha * dotIO
+        # if inVerbose('wDelta'):
+        #     print("wDelta: ", wDelta)
         self.weights += wDelta
         # print("wts:", self.weights)
         return prediction, iDelta

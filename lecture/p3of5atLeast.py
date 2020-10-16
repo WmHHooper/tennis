@@ -18,6 +18,7 @@ nn = NNet([[[-0.829638, 0.164111, 0.398885],
             [-0.732674, -0.825474, 0.232357]]], bias=True)
             # ]])
 nn.setActivations(['linear'])
+nn.setVerbose([])
 
 nn.checkup(inputData, targetData)
 

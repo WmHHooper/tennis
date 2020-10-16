@@ -3,9 +3,11 @@ from verbosePrint import vprint
 import verbosePrint
 
 from lecture.p3of5 import inputData
-from lecture.p3of5 import inputTraining
+from lecture.p3of5 import inputData as inputTraining
+# from lecture.p3of5 import inputTraining
 from lecture.p3of5 import exactly as targetData
-from lecture.p3of5 import exactTraining as targetTraining
+from lecture.p3of5 import exactly as targetTraining
+# from lecture.p3of5 import exactTraining as targetTraining
 
 # nn = NNet(sizes=[6, 8, 2])
 nn = NNet([
@@ -33,7 +35,7 @@ nn.checkup(inputData, targetData)
 verbosePrint.vIteration = -1
 verbosePrint.stage = ''
 
-cycles = 4000
+cycles = 2000
 report = cycles/10
 
 for iteration in range(cycles + 1):
