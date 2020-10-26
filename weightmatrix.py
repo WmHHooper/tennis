@@ -2,10 +2,16 @@ import sys, numpy as np
 from activation import getAct, getDer
 from mask import nomask, nomasks # , mask
 from pprint import pformat
+from numbers import Number
 
 allVerbose = ['activation', 'alpha', 'odelta', 'idelta', 'wdelta']
 def inVerbose(s):
     return s.lower() in allVerbose
+
+# def deepArray(weights):
+#     if isinstance(weights, (np.ndarray, Number)):
+#         return weights
+#     return np.array([deepArray(w) for w in weights])
 
 class WeightMatrix:
     weights = False   # A 2-dimensional array of coefficients.
@@ -19,15 +25,21 @@ class WeightMatrix:
                  bias=False,
                  ):
         """
-
+        Create a matrix of weights, fully connecting an input layer
+        with an output layer.
         :param initialWeights: if you want exact weights,
                 specify one 2-D grid for each pair of layers
         :param rows, cols: alternately, specify the layer sizes
                 and weights will be generated randomly
         :param bias: True iff you want one column to be a bias.
+        If initialWeights are specified, the last column of weights
+        is expected to be the bias.
+        If rows and cols are specified, the new matrix will have
+        (cols + 1) columns.
         """
         self.bias = bias
         if len(initialWeights) > 0:
+            # self.weights = deepArray(initialWeights)
             if isinstance(initialWeights, np.ndarray):
                 self.weights = initialWeights
             else:
@@ -70,11 +82,23 @@ class WeightMatrix:
     def getAlpha(self):
         return self.alpha
 
+    def inputLength(self):
+        rows = len(self.weights)
+        if self.bias:
+            rows -= 1
+        return rows
+
+    def outputLength(self):
+        cols = len(self.weights[0])
+        return cols
+
     def setActivation(self, derLabel, actLabel):
         """
         Set the functions for activation and back propagation.
-        :param derLabel: The derivative for back-propagation to the previous layer
-        :param actLabel: The activation to apply to the weighted sum
+        :param derLabel: The derivative for back-propagation
+        to the previous layer
+        :param actLabel: The activation to apply
+        to the weighted sum
         :return:
         """
         self.derFunction = getDer(derLabel)
@@ -87,8 +111,6 @@ class WeightMatrix:
         Fire the neural network.
         :param datain: the input layer, one row of values for each
         member of the input batch.
-        :param omask: an output mask.  Each value in the mask
-            is multiplied by the corresponding value in the output.
         :return: the next layer of the grid.
         '''
         # if not isinstance(datain, np.ndarray):
@@ -104,21 +126,23 @@ class WeightMatrix:
         output = self.actFunction(sums)
         return output
 
-    def learn(self
+    def train(self
               , datain
               , prediction
               , goal
               # , imask=nomask
               ):
         """
-        One iteration of the learning algorithm described in Trask, 227.
+        One iteration of the learning algorithm
+        described in Trask, 227.
         :param datain: one dimensional array of input data
         :param goal: one dimensional array of data tags
         :param masks: a pair of masks, mask[0] for the input layer,
             and mask[1] for the output layer.
         :param imask: an input mask.  Each value in the mask
             is multiplied by the corresponding delta for the input.
-        :return: amount to change input.  Used for back-propagation.
+        :return: amount to change input.
+        Used for back-propagation.
         """
         assert isinstance(datain, np.ndarray)
         assert isinstance(prediction, np.ndarray)
@@ -153,11 +177,11 @@ class WeightMatrix:
         #     sd = iDelta.shape
         #     assert sm == sd
         #     iDelta *= imask
-        dotIO = datain.T.dot(oDelta)
+        wDelta = datain.T.dot(oDelta)
         # print("LI * LOD:", dotIO)
-        wDelta = self.alpha * dotIO
+        wDelta *= self.alpha
         # if inVerbose('wDelta'):
         #     print("wDelta: ", wDelta)
         self.weights += wDelta
         # print("wts:", self.weights)
-        return prediction, iDelta
+        return iDelta

@@ -18,7 +18,8 @@ def relu2deriv(output):
     # return 0 otherwise
     return output > 0  # returns 1 for datain >= 0
 
-# these two functions reproduce a bug in Grokking, p. 284
+# these two functions reproduce a bug in
+# Grokking, p. 284
 def brelu(x):
     return (x > 0) * x  # returns x if x > 0
     # return 0 otherwise
@@ -33,7 +34,7 @@ def zeta(x):
     # return 0 otherwise
 
 def zeta2deriv(output):
-    return (output > 0) * (output < 1)   # 1 if 0 < y < 1
+    return (output > 0) * (output < 1)  # 1 if 0 < y < 1
     # return 0 otherwise
 
 def sigmoid(x):
@@ -58,31 +59,25 @@ def softmax(x):
     # see Grokking, p. 344
 
 def softmax2deriv(output):
-    raise NotImplementedError('Softmax is intended for final output, only!')
+    # This is not quite right, but it works because
+    # a linear derivative pushes the deltas
+    # in the proper direction
+    # and approximately proper amount
+    return (output > 0) + (output <= 0)  #i.e., all 1's
 
 actMap = {
-    'linear': linear,
-    'relu': relu,
-    'brelu': brelu,
-    'zeta': zeta,
-    'sigmoid': sigmoid,
-    'tanh': tanh,
-    'softmax': softmax
+    'linear': [linear, linear2deriv],
+    'relu': [relu, relu2deriv],
+    'brelu': [brelu, brelu2deriv],
+    'zeta': [zeta, zeta2deriv],
+    'sigmoid': [sigmoid, sigmoid2deriv],
+    'tanh': [tanh, tanh2deriv],
+    'softmax': [softmax, softmax2deriv],
 }
 
 def getAct(s):
-    return actMap[s.lower()]
-
-derMap = {
-    'linear': linear2deriv,
-    'relu': relu2deriv,
-    'brelu': brelu2deriv,
-    'zeta': zeta2deriv,
-    'sigmoid': sigmoid2deriv,
-    'tanh': tanh2deriv,
-    'softmax': softmax2deriv
-}
+    return actMap[s.lower()][0]
 
 def getDer(s):
-    return derMap[s.lower()]
+    return actMap[s.lower()][1]
 

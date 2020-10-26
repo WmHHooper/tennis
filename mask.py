@@ -3,7 +3,7 @@ from numpy import nan
 
 nomask = 1
 
-class mask:
+class Mask:
     input_coefficients = nomask
     output_coefficients = nomask
 
@@ -54,7 +54,7 @@ class mask:
     def omask(self):
         return self.output_coefficients
 
-nomasks = mask(0)
+nomasks = Mask(0)
 assert nomask == nomasks.imask()
 assert nomask == nomasks.omask()
 
@@ -65,7 +65,7 @@ if testing:
     # layer_1 = (3, 10)
     layer_1 = 20
     np.random.seed(1)
-    mask1 = mask(layer_1)
+    mask1 = Mask(layer_1)
     np.random.seed(1)
     # imask2 = np.random.randint(2, size=layer_1.shape)
     # omask2 = imask2 * 2
