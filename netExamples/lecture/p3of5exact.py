@@ -37,19 +37,23 @@ verbosePrint.stage = ''
 
 cycles = 2000
 report = cycles/10
+batch_size = 4
 
 for iteration in range(cycles + 1):
     vprint(iteration, '~~~~~~~~~~~ Iteration %d ~~~~~~~~~~~' % iteration)
     combinedError = 0
-    for row_index in range(len(targetTraining)):
-        datain = inputTraining[row_index:row_index + 1]
-        goal_prediction = targetTraining[row_index:row_index + 1]
+    batch_limit = int(len(targetTraining) / batch_size)
+    for batch_index in range(batch_limit):
+        row_index = batch_index * batch_size
+        batch = row_index + batch_size
+        datain = inputTraining[row_index:batch]
+        goal_prediction = targetTraining[row_index:batch]
         prediction = nn.fire(datain)
         # print('Prediction:' + str(prediction))
         vprint(iteration, nn)
 
         error = (goal_prediction - prediction) ** 2
-        combinedError += error
+        combinedError += sum(error)
 
         nn.learn(datain, goal_prediction)
 

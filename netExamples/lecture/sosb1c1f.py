@@ -15,7 +15,7 @@ nn.setActivations(['softMax', 'sigmoid'])
 verbosePrint.vIteration = -1
 verbosePrint.stage = ''
 
-cycles = 20
+cycles = 100
 report = max(1, cycles/10)
 checkupParams = (inputData, targetData, inputTraining, 25)
 
