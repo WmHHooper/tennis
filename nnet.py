@@ -149,7 +149,7 @@ class NNet:
     def setActivations(self, lList):
         '''
         :param lList: A list of the activation functions for each
-        layer.
+        grid.
         '''
         n = len(lList)
         assert n == len(self.grids)

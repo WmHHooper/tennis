@@ -76,9 +76,10 @@ class ConvolutionMatrix(weightmatrix.WeightMatrix):
                 sect = dataGrid[:, rs:rf, cs:cf]
                 sects.append(sect)
 
-        expanded_input = np.concatenate(sects, axis=1)
+        sects = np.array(sects)
+        expanded_input = np.concatenate(sects, axis=0)
         es = expanded_input.shape
-        flattened_input = expanded_input.reshape(es[0] * es[1], -1)
+        flattened_input = expanded_input.reshape(es[0], -1)
         if self.bias:
             biasColumn = np.ones((len(flattened_input), 1))
             flattened_input = np.block([flattened_input, biasColumn])
@@ -97,8 +98,8 @@ class ConvolutionMatrix(weightmatrix.WeightMatrix):
         batch_size = len(prediction)
         assert batch_size == len(goal)
         oDelta = (goal - prediction) / batch_size
-        oShape = self.outputShape()
-        odReshape = oDelta.reshape(*oShape)
+        oRows, oCols = self.outputShape()
+        odReshape = oDelta.reshape(batch_size * oRows, oCols)
         # This is not right, but we don't need this until
         # we stack convolutional layers
         # iDelta = odReshape.dot(self.weights.T)

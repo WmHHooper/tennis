@@ -1,6 +1,7 @@
 from nnet import NNet
 from verbosePrint import vprint
 import verbosePrint
+import time
 
 from netExamples.lecture.p3of5 import inputData
 from netExamples.lecture.p3of5 import inputData as inputTraining
@@ -39,6 +40,8 @@ cycles = 2000
 report = cycles/10
 batch_size = 4
 
+# https://stackoverflow.com/a/7370824/2619926
+startTime = time.time()
 for iteration in range(cycles + 1):
     vprint(iteration, '~~~~~~~~~~~ Iteration %d ~~~~~~~~~~~' % iteration)
     combinedError = 0
@@ -63,5 +66,7 @@ for iteration in range(cycles + 1):
     vprint(iteration, '~~~~~~~~~~~~~~~ End ~~~~~~~~~~~~~~~~')
     vprint(iteration, nn, quit=True)
 
+stopTime = time.time()
 print()
 nn.checkup(inputData, targetData)
+print('Elapsed time:  %.2f seconds' % (stopTime - startTime))

@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import nan
-from enum import Enum, auto
+# from enum import Enum, auto
+import sys
 
 def linear(x, dummy=nan):
     return x  # the identity activation
@@ -9,6 +10,7 @@ def linear2deriv(output):
     return (output > 0) + (output <= 0)
     # returns 1 for every element of output
 
+# Grokking, p. 125
 def relu(x):
     return (x > 0) * x  # returns x if x > 0
     # return 0 otherwise
@@ -19,7 +21,7 @@ def relu2deriv(output):
     return output > 0  # returns 1 for datain >= 0
 
 # these two functions reproduce a bug in
-# Grokking, p. 284
+# Grokking, p. 156
 def brelu(x):
     return (x > 0) * x  # returns x if x > 0
     # return 0 otherwise
@@ -37,26 +39,29 @@ def zeta2deriv(output):
     return (output > 0) * (output < 1)  # 1 if 0 < y < 1
     # return 0 otherwise
 
+# see Grokking, p. 173
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
-    # see Grokking, p. 335
 
 def sigmoid2deriv(output):
     return output * (1 - output)
-    # see Grokking, p. 354
 
 def tanh(x):
     return np.tanh(x)
-    # see Grokking, p. 336
 
 def tanh2deriv(output):
     return 1 - (output ** 2)
-    # see Grokking, p. 354
 
+# see Grokking, p. 173-174
 def softmax(x):
-    temp = np.exp(x)
-    return temp / np.sum(temp, axis=1, keepdims=True)
-    # see Grokking, p. 344
+    try:
+        temp = np.exp(x)
+        total = np.sum(temp, axis=1, keepdims=True)
+        return temp / total
+    except:
+        print('SoftMax error: exp(%s)' % x.dtype)
+        print(x)
+        sys.exit(1)
 
 def softmax2deriv(output):
     # This is not quite right, but it works because
